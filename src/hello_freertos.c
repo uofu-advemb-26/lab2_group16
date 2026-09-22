@@ -21,6 +21,7 @@ bool on = false;
 #define MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 #define BLINK_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 
+// Task that toggles the LED once every 500 ticks.
 void blink_task(__unused void *params) {
     hard_assert(cyw43_arch_init() == PICO_OK);
     while (true) {
@@ -30,6 +31,8 @@ void blink_task(__unused void *params) {
     }
 }
 
+// Creates a task that runs blink_task. While loop reads for user input and outputs
+// upper-case letter if input is lower-case, and vice-versa.
 void main_task(__unused void *params) {
     xTaskCreate(blink_task, "BlinkThread",
                 BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
@@ -41,6 +44,8 @@ void main_task(__unused void *params) {
     }
 }
 
+// Initializes stdio devices. Creates a task for main_task. Starts scheduler that
+// hands control of tasks to the kernel, which runs the tasks.
 int main( void )
 {
     stdio_init_all();
@@ -49,6 +54,7 @@ int main( void )
     TaskHandle_t task;
     xTaskCreate(main_task, "MainThread",
                 MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &task);
+    // Hands kernel control of tasks, which starts them.
     vTaskStartScheduler();
     return 0;
 }
