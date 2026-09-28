@@ -13,14 +13,14 @@
 #include "pico/multicore.h"
 #include "pico/cyw43_arch.h"
 
-void led_blink(bool);
-void my_put_char(char);
-void multi_blink(int);
+
+char swap_case(char);
+void multi_blink(int*, bool*, int, TickType_t);
 
 int count = 0;
 bool on = false;
 const int delay = 500; //delay: how long should multi_blink wait in between calls?
-int frequency = 11; //frequency: how many times do I have to run multi_blink for the led to toggle?
+int frequency = 1; //frequency: how many times do I have to run multi_blink for the led to toggle?
 
 #define MAIN_TASK_PRIORITY      ( tskIDLE_PRIORITY + 1UL )
 #define BLINK_TASK_PRIORITY     ( tskIDLE_PRIORITY + 2UL )
@@ -31,7 +31,7 @@ int frequency = 11; //frequency: how many times do I have to run multi_blink for
 void blink_task(__unused void *params) {
     hard_assert(cyw43_arch_init() == PICO_OK);
     while (true) {
-        multi_blink(frequency);
+        multi_blink(&count, &on, frequency, delay);
     }
 }
 
@@ -43,8 +43,7 @@ void main_task(__unused void *params) {
     char c;
     //c is all characters put into standard input
     while(c = getchar()) {
-        //this will output transformed characters to standard output (see function)
-        my_put_char(c); 
+        putchar(swap_case(c));
     }
 }
 
@@ -63,20 +62,22 @@ int main( void )
     return 0;
 }
 
-void led_blink(bool on) {
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
-}
 
-void multi_blink(int frequency) {
-    led_blink(on);
-    if (count++ % frequency) on = !on;
+void multi_blink(int *count, bool *on, int frequency, TickType_t delay) {
+    if (*count % frequency == 0) {
+        *on = !*on;
+    }
+
+    (*count)++;
+
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, *on);
     vTaskDelay(delay);
 }
 
 
 //This function takes a character, changes nothing if it is not a letter, swaps the uppercase/lowercase if it is a letter, and outputs it to std output
-void my_put_char(char c) {
-        if (c <= 'z' && c >= 'a') putchar(c - 32);
-        else if (c >= 'A' && c <= 'Z') putchar(c + 32);
-        else putchar(c);
+char swap_case(char c) {
+        if (c <= 'z' && c >= 'a') return(c - 32);
+        else if (c >= 'A' && c <= 'Z') return(c + 32);
+        else return(c);
 }
