@@ -13,6 +13,8 @@
 #include "pico/multicore.h"
 #include "pico/cyw43_arch.h"
 
+void led_blink(int);
+
 int count = 0;
 bool on = false;
 
@@ -25,9 +27,7 @@ bool on = false;
 void blink_task(__unused void *params) {
     hard_assert(cyw43_arch_init() == PICO_OK);
     while (true) {
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
-        if (count++ % 11) on = !on;
-        vTaskDelay(500);
+        led_blink(500);
     }
 }
 
@@ -57,4 +57,10 @@ int main( void )
     // Hands kernel control of tasks, which starts them.
     vTaskStartScheduler();
     return 0;
+}
+
+void led_blink(int delay) {
+    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
+    if (count++ % 11) on = !on;
+    vTaskDelay(delay);
 }
