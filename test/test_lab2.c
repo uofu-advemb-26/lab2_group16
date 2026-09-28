@@ -18,15 +18,6 @@ void test_multi_blinks()
 
 }
 
-void test_swap_case_()
-{
-    char test_char = 'a';
-    char expected_char = 'A';
-    char result_char;
-    result_char = swap_case(test_char);
-    TEST_ASSERT_TRUE_MESSAGE(expected_char == result_char, "Successfully swaps from lowercase to uppercase");
-}
-
 void test_swap_case_lower()
 {
     char test_char = 'a';
