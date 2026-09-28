@@ -45,6 +45,7 @@ add_test(NAME simulate_mytest COMMAND
 
 find_program(OPENOCD openocd)
 find_program(PICOTOOL picotool)
+set(OPENOCD_PATH /usr/local/share/openocd)
 
 add_custom_target(flash_test ${PICOTOOL} load -f $<TARGET_FILE:mytest> DEPENDS mytest)
 add_custom_target(openocd_test ${OPENOCD} -s ${OPENOCD_PATH} -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c 'adapter speed 5000' -c 'program "$<TARGET_FILE:mytest>" verify reset exit' DEPENDS mytest)
