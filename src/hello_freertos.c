@@ -13,11 +13,14 @@
 #include "pico/multicore.h"
 #include "pico/cyw43_arch.h"
 
-void led_blink(int);
+void led_blink(bool);
 void my_put_char(char);
+void multi_blink(int);
 
 int count = 0;
 bool on = false;
+const int delay = 500; //delay: how long should multi_blink wait in between calls?
+int frequency = 11; //frequency: how many times do I have to run multi_blink for the led to toggle?
 
 #define MAIN_TASK_PRIORITY      ( tskIDLE_PRIORITY + 1UL )
 #define BLINK_TASK_PRIORITY     ( tskIDLE_PRIORITY + 2UL )
@@ -28,7 +31,7 @@ bool on = false;
 void blink_task(__unused void *params) {
     hard_assert(cyw43_arch_init() == PICO_OK);
     while (true) {
-        led_blink(500);
+        multi_blink(frequency);
     }
 }
 
@@ -38,7 +41,9 @@ void main_task(__unused void *params) {
     xTaskCreate(blink_task, "BlinkThread",
                 BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
     char c;
+    //c is all characters put into standard input
     while(c = getchar()) {
+        //this will output transformed characters to standard output (see function)
         my_put_char(c); 
     }
 }
@@ -58,12 +63,18 @@ int main( void )
     return 0;
 }
 
-void led_blink(int delay) {
+void led_blink(bool on) {
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
-    if (count++ % 11) on = !on;
+}
+
+void multi_blink(int frequency) {
+    led_blink(on);
+    if (count++ % frequency) on = !on;
     vTaskDelay(delay);
 }
 
+
+//This function takes a character, changes nothing if it is not a letter, swaps the uppercase/lowercase if it is a letter, and outputs it to std output
 void my_put_char(char c) {
         if (c <= 'z' && c >= 'a') putchar(c - 32);
         else if (c >= 'A' && c <= 'Z') putchar(c + 32);
