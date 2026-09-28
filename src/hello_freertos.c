@@ -14,6 +14,7 @@
 #include "pico/cyw43_arch.h"
 
 void led_blink(int);
+void my_put_char(char);
 
 int count = 0;
 bool on = false;
@@ -38,9 +39,7 @@ void main_task(__unused void *params) {
                 BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
     char c;
     while(c = getchar()) {
-        if (c <= 'z' && c >= 'a') putchar(c - 32);
-        else if (c >= 'A' && c <= 'Z') putchar(c + 32);
-        else putchar(c);
+        my_put_char(c); 
     }
 }
 
@@ -63,4 +62,10 @@ void led_blink(int delay) {
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
     if (count++ % 11) on = !on;
     vTaskDelay(delay);
+}
+
+void my_put_char(char c) {
+        if (c <= 'z' && c >= 'a') putchar(c - 32);
+        else if (c >= 'A' && c <= 'Z') putchar(c + 32);
+        else putchar(c);
 }
