@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <hello_freertos.h>
 #include <stdio.h>
 
 #include "FreeRTOS.h"
@@ -12,10 +13,6 @@
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
 #include "pico/cyw43_arch.h"
-
-
-char swap_case(char);
-void multi_blink(int*, bool*, int, TickType_t);
 
 int count = 0;
 bool on = false;
