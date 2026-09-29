@@ -13,9 +13,48 @@ void setUp() {}
 
 void tearDown() {}
 
-void test_multi_blinks()
-{
+static bool gpio_value;
+static TickType_t delay_value;
 
+
+// At count 0, toggle the LED on, then increment the count. This test assures that things are passed through correctly and the led toggles
+void test_multi_blink_toggles_at_count_zero(void)
+{
+    int count = 0;
+    bool on = false;
+
+    multi_blink(&count, &on, 5, 10);
+
+    TEST_ASSERT_EQUAL_MESSAGE(1, count, "count increments");
+    TEST_ASSERT_EQUAL_MESSAGE(true, on, "led toggles, count = 0");
+    TEST_ASSERT_EQUAL_MESSAGE(true, gpio_value, "LED should be on");
+    TEST_ASSERT_EQUAL_MESSAGE(10, delay_value, "delay properly passed");
+}
+
+// Before we reach frequency, the led doesn't toggle. the led should only toggle on count 5
+void test_multi_blink_does_not_toggle_between_boundaries(void)
+{
+    int count = 4;
+    bool on = true;
+
+    multi_blink(&count, &on, 5, 10);
+
+    TEST_ASSERT_EQUAL_MESSAGE(5, count, "count increments");
+    TEST_ASSERT_EQUAL_MESSAGE(true, on, "LED should not toggle before count 5");
+    TEST_ASSERT_EQUAL_MESSAGE(true, gpio_value, "LED should be written on at count 5");
+}
+
+
+void test_multi_blink_toggles_at_frequency_boundary(void)
+{
+    int count = 5;
+    bool on = true;
+
+    multi_blink(&count, &on, 5, 10);
+
+    TEST_ASSERT_EQUAL_MESSAGE(6, count, "count increments");
+    TEST_ASSERT_EQUAL_MESSAGE(false, on, "LED toggles on count 5");
+    TEST_ASSERT_EQUAL_MESSAGE(false, gpio_value, "LED should be off");
 }
 
 void test_swap_case_lower()
@@ -89,15 +128,18 @@ int main (void)
         sleep_ms(5000); // Give time for TTY to attach.
         printf("Start tests\n");
         UNITY_BEGIN();
-        // multi_blink() tests
-        RUN_TEST(test_multi_blinks);
-
         // swap_case() tests
         RUN_TEST(test_swap_case_lower);
         RUN_TEST(test_swap_case_upper);
         RUN_TEST(test_swap_case_symbol);
         RUN_TEST(test_swap_case_digit);
+        sleep_ms(2000);
+        // multi_blink() tests
+        RUN_TEST(test_multi_blink_toggles_at_frequency_boundary);
+        RUN_TEST(test_multi_blink_does_not_toggle_between_boundaries);
+        RUN_TEST(test_multi_blink_toggles_at_count_zero);
         sleep_ms(5000);
+
         UNITY_END();
     }
 }
