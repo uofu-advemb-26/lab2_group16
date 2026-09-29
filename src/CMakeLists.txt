@@ -3,14 +3,17 @@ add_executable(hello_freertos
     hello_freertos.c
     hello_freertos_helpers.c
     )
+target_include_directories(hello_freertos PRIVATE
+    ${UNITY_PATH}/src
+)
 
 pico_set_program_name(hello_freertos "test")
 pico_set_program_version(hello_freertos "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB.
 # These are mutually exclusive, only set one.
-pico_enable_stdio_uart(hello_freertos 1)
-pico_enable_stdio_usb(hello_freertos 0)
+pico_enable_stdio_uart(hello_freertos 0)
+pico_enable_stdio_usb(hello_freertos 1)
 
 # Add the libraries to the build
 target_link_libraries(hello_freertos PRIVATE

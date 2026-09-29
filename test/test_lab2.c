@@ -8,6 +8,7 @@
 #include "task.h"
 #include "pico/multicore.h"
 #include "pico/cyw43_arch.h"
+#include "pico/stdio_usb.h"
 
 void setUp() {}
 
@@ -124,8 +125,24 @@ void test_swap_case_digit()
 int main (void)
 {
     stdio_init_all();
-    while (1) {
-        sleep_ms(5000); // Give time for TTY to attach.
+
+    // wait until a USB terminal is actually connected.
+    while (!stdio_usb_connected()) {
+        sleep_ms(100);
+    }
+
+    printf("Terminal connected. Press r to run tests.\n");
+
+    // wait for r from the terminal.
+    while (true) {
+        int character = getchar_timeout_us(100000);
+
+        if (character == 'r' || character == 'R') {
+            break;
+        }
+    }
+
+    while (true) {
         printf("Start tests\n");
         UNITY_BEGIN();
         // swap_case() tests

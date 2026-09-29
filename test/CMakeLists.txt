@@ -1,5 +1,9 @@
 add_executable(mytest test_lab2.c ../src/hello_freertos_helpers.c unity_config.c)
 
+target_include_directories(mytest PRIVATE
+    ${UNITY_PATH}/src
+)
+
 target_link_libraries(mytest PRIVATE
   pico_stdlib
   pico_async_context_freertos
@@ -17,8 +21,9 @@ endif()
 
 # Modify the below lines to enable/disable output over UART/USB.
 # These are mutually exclusive, only set one.
-pico_enable_stdio_uart(mytest 1)
-pico_enable_stdio_usb(mytest 0)
+pico_enable_stdio_uart(mytest 0)
+pico_enable_stdio_usb(mytest 1)
+
 
 # This will speed up the simulation, since data won't be copied from the flash controller.
 # It does make the binary non-persistent on a real microcontroller.
