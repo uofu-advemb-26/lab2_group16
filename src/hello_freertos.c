@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <hello_freertos.h>
+#include <hello_freertos_helpers.h>
 #include <stdio.h>
 
 #include "FreeRTOS.h"
@@ -15,6 +17,8 @@
 
 int count = 0;
 bool on = false;
+const int delay = 500; //delay: how long should multi_blink wait in between calls?
+int frequency = 1; //frequency: how many times do I have to run multi_blink for the led to toggle?
 
 #define MAIN_TASK_PRIORITY      ( tskIDLE_PRIORITY + 1UL )
 #define BLINK_TASK_PRIORITY     ( tskIDLE_PRIORITY + 2UL )
@@ -25,9 +29,7 @@ bool on = false;
 void blink_task(__unused void *params) {
     hard_assert(cyw43_arch_init() == PICO_OK);
     while (true) {
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
-        if (count++ % 11) on = !on;
-        vTaskDelay(500);
+        multi_blink(&count, &on, frequency, delay);
     }
 }
 
@@ -37,10 +39,9 @@ void main_task(__unused void *params) {
     xTaskCreate(blink_task, "BlinkThread",
                 BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
     char c;
+    //c is all characters put into standard input
     while(c = getchar()) {
-        if (c <= 'z' && c >= 'a') putchar(c - 32);
-        else if (c >= 'A' && c <= 'Z') putchar(c + 32);
-        else putchar(c);
+        putchar(swap_case(c));
     }
 }
 
