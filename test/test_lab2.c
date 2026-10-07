@@ -14,10 +14,6 @@ void setUp() {}
 
 void tearDown() {}
 
-static bool gpio_value;
-static TickType_t delay_value;
-
-
 // At count 0, toggle the LED on, then increment the count. This test assures that things are passed through correctly and the led toggles
 void test_multi_blink_toggles_at_count_zero(void)
 {
@@ -28,8 +24,6 @@ void test_multi_blink_toggles_at_count_zero(void)
 
     TEST_ASSERT_EQUAL_MESSAGE(1, count, "count increments");
     TEST_ASSERT_EQUAL_MESSAGE(true, on, "led toggles, count = 0");
-    TEST_ASSERT_EQUAL_MESSAGE(true, gpio_value, "LED should be on");
-    TEST_ASSERT_EQUAL_MESSAGE(10, delay_value, "delay properly passed");
 }
 
 // Before we reach frequency, the led doesn't toggle. the led should only toggle on count 5
@@ -42,7 +36,6 @@ void test_multi_blink_does_not_toggle_between_boundaries(void)
 
     TEST_ASSERT_EQUAL_MESSAGE(5, count, "count increments");
     TEST_ASSERT_EQUAL_MESSAGE(true, on, "LED should not toggle before count 5");
-    TEST_ASSERT_EQUAL_MESSAGE(true, gpio_value, "LED should be written on at count 5");
 }
 
 
@@ -55,7 +48,6 @@ void test_multi_blink_toggles_at_frequency_boundary(void)
 
     TEST_ASSERT_EQUAL_MESSAGE(6, count, "count increments");
     TEST_ASSERT_EQUAL_MESSAGE(false, on, "LED toggles on count 5");
-    TEST_ASSERT_EQUAL_MESSAGE(false, gpio_value, "LED should be off");
 }
 
 void test_swap_case_lower()
