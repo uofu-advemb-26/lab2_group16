@@ -118,6 +118,7 @@ int main (void)
 {
     stdio_init_all();
 
+    while (true) {
         printf("Start tests\n");
         UNITY_BEGIN();
         // swap_case() tests
@@ -133,4 +134,5 @@ int main (void)
         sleep_ms(5000);
 
         UNITY_END();
+    }
 }
