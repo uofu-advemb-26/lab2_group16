@@ -118,22 +118,6 @@ int main (void)
 {
     stdio_init_all();
 
-    // wait until a USB terminal is actually connected.
-    while (!stdio_usb_connected()) {
-        sleep_ms(100);
-    }
-
-    printf("Terminal connected. Press r to run tests.\n");
-
-    // wait for r from the terminal.
-    while (true) {
-        int character = getchar_timeout_us(100000);
-
-        if (character == 'r' || character == 'R') {
-            break;
-        }
-    }
-
     while (true) {
         printf("Start tests\n");
         UNITY_BEGIN();
